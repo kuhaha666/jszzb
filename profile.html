@@ -180,14 +180,21 @@
             <!-- 管理员面板 -->
             <div id="adminPanel" style="display:none">
                 <h2 style="margin-top:16px">🛡️ 管理面板</h2>
-                <div class="profile-card" style="text-align:left">
-                    <h3 style="font-size:17px;margin-bottom:8px">📋 全部问题</h3>
-                    <div id="adminQuestions"></div>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:16px">
+                    <div style="flex:1;min-width:200px;background:#fff;border-radius:10px;padding:16px;text-align:center;border:1px solid #e5e7eb">
+                        <div style="font-size:28px;font-weight:bold;color:#1677ff" id="adminQCount">0</div>
+                        <div style="font-size:13px;color:#999">总提问</div>
+                    </div>
+                    <div style="flex:1;min-width:200px;background:#fff;border-radius:10px;padding:16px;text-align:center;border:1px solid #e5e7eb">
+                        <div style="font-size:28px;font-weight:bold;color:#52c41a" id="adminACount">0</div>
+                        <div style="font-size:13px;color:#999">总回答</div>
+                    </div>
+                    <div style="flex:1;min-width:200px;background:#fff;border-radius:10px;padding:16px;text-align:center;border:1px solid #e5e7eb">
+                        <div style="font-size:28px;font-weight:bold;color:#faad14" id="adminUCount">0</div>
+                        <div style="font-size:13px;color:#999">活跃用户</div>
+                    </div>
                 </div>
-                <div class="profile-card" style="text-align:left">
-                    <h3 style="font-size:17px;margin-bottom:8px">👥 注册用户</h3>
-                    <div id="adminUsers"></div>
-                </div>
+                <a href="admin.html" style="display:block;text-align:center;padding:14px;background:#1677ff;color:#fff;text-decoration:none;border-radius:8px;font-size:15px;font-weight:bold">进入完整管理后台 →</a>
             </div>
         </div>
     </div>
@@ -294,60 +301,17 @@
         }
 
         function loadAdminData() {
-            // 所有问题
-            window.supabaseClient.from('questions').select('*').order('created_at', { ascending: false }).limit(200)
-                .then(function(res) {
-                    var div = document.getElementById('adminQuestions');
-                    if (res.error || !res.data || res.data.length === 0) {
-                        div.innerHTML = '<span style="color:#999">暂无内容</span>'; return;
-                    }
-                    var html = '<ul style="list-style:none;padding:0">';
-                    res.data.forEach(function(q) {
-                        html += '<li style="padding:8px 0;border-bottom:1px dashed #eee;display:flex;justify-content:space-between;align-items:center">';
-                        html += '<div><b style="color:#1677ff;font-size:12px">[' + (q.category||'无') + ']</b> ' + escHtml(q.title) + '<br><span style="font-size:12px;color:#999">' + (q.user_email||'?').split('@')[0] + ' · ' + timeAgo(q.created_at) + '</span></div>';
-                        html += '<button onclick="adminDelQ(' + q.id + ')" style="background:none;border:none;color:#ccc;cursor:pointer;font-size:16px;flex-shrink:0;margin-left:8px" title="删除">✕</button>';
-                        html += '</li>';
-                    });
-                    html += '</ul>';
-                    div.innerHTML = html;
+            // 快速统计
+            window.supabaseClient.from('questions').select('id',{count:'exact',head:true})
+                .then(function(r){ document.getElementById('adminQCount').textContent = r.count||0; });
+            window.supabaseClient.from('answers').select('id',{count:'exact',head:true})
+                .then(function(r){ document.getElementById('adminACount').textContent = r.count||0; });
+            window.supabaseClient.from('questions').select('user_email').limit(500)
+                .then(function(res){
+                    var users = {};
+                    if(res.data) res.data.forEach(function(q){ if(q.user_email) users[q.user_email]=true; });
+                    document.getElementById('adminUCount').textContent = Object.keys(users).length;
                 });
-
-            // 注册用户
-            window.supabaseClient.rpc('list_users', {}).then(function(r) {}); // fallback
-            // Supabase 不直接暴露用户列表给客户端，用 SQL 函数
-            loadUsersFallback();
-        }
-
-        function loadUsersFallback() {
-            // 从 questions 和 answers 聚合活跃用户
-            var users = {};
-            var promises = [];
-            promises.push(
-                window.supabaseClient.from('questions').select('user_email').order('created_at',{ascending:false}).limit(500)
-                    .then(function(res) { if (res.data) res.data.forEach(function(q) { if(q.user_email) users[q.user_email] = true; }); })
-            );
-            promises.push(
-                window.supabaseClient.from('answers').select('user_email').order('created_at',{ascending:false}).limit(500)
-                    .then(function(res) { if (res.data) res.data.forEach(function(a) { if(a.user_email) users[a.user_email] = true; }); })
-            );
-            Promise.all(promises).then(function() {
-                var list = Object.keys(users).sort();
-                var html = '<p style="font-size:13px;color:#888;margin-bottom:8px">共 ' + list.length + ' 位活跃用户（发过帖或回复）</p>';
-                list.forEach(function(email, i) {
-                    html += '<span style="display:inline-block;background:#f0f7ff;color:#1677ff;padding:3px 10px;border-radius:12px;font-size:13px;margin:2px 4px">' + (i+1) + '. ' + email.split('@')[0] + '</span>';
-                });
-                document.getElementById('adminUsers').innerHTML = html;
-            });
-        }
-
-        function adminDelQ(qid) {
-            if (!confirm('管理员：确定删除这个问题和所有回答吗？')) return;
-            window.supabaseClient.from('answers').delete().eq('question_id', qid).then(function() {
-                window.supabaseClient.from('questions').delete().eq('id', qid).then(function(res) {
-                    if (res.error) { alert('失败: '+res.error.message); return; }
-                    loadAdminData();
-                });
-            });
         }
 
         function timeAgo(d) {
