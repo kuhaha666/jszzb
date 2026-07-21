@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - 江苏专转本资讯网</title>
+    <meta name="description" content="江苏专转本资讯网个人中心，管理个人信息、查看发帖记录。">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .profile-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 30px;
+            max-width: 600px;
+            margin: 0 auto 24px;
+            text-align: center;
+        }
+        .avatar-wrap {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 16px;
+        }
+        .avatar-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #e5e7eb;
+        }
+        .avatar-edit {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #1677ff;
+            color: #fff;
+            border: 2px solid #fff;
+            cursor: pointer;
+            font-size: 13px;
+            line-height: 24px;
+            text-align: center;
+        }
+        .profile-name {
+            font-size: 20px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 4px;
+        }
+        .profile-email {
+            font-size: 14px;
+            color: #999;
+            margin-bottom: 20px;
+        }
+        .profile-stats {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            margin-bottom: 24px;
+        }
+        .profile-stat {
+            text-align: center;
+        }
+        .profile-stat .num {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1677ff;
+        }
+        .profile-stat .label {
+            font-size: 12px;
+            color: #999;
+        }
+        .form-group {
+            margin-bottom: 14px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 4px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px 14px;
+            font-size: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            box-sizing: border-box;
+        }
+        .form-group input:focus {
+            border-color: #1677ff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(22,119,255,0.1);
+        }
+        .btn-save {
+            padding: 10px 28px;
+            background: #1677ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-save:hover { background: #0958d9; }
+        .btn-save:disabled { background: #93c0f5; }
+        .success-msg {
+            background: #f6ffed;
+            border: 1px solid #b7eb8f;
+            color: #389e0d;
+            padding: 8px 14px;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 12px;
+            display: none;
+        }
+        .section-title {
+            font-size: 15px;
+            color: #888;
+            margin: 24px 0 12px;
+            text-align: left;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #eee;
+        }
+        .my-post {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px dashed #eee;
+            text-align: left;
+            font-size: 14px;
+        }
+        .my-post a { color: #1677ff; text-decoration: none; }
+        .my-post a:hover { text-decoration: underline; }
+        .my-post .post-time { font-size: 12px; color: #999; white-space: nowrap; margin-left: 12px; }
+    </style>
+</head>
+<body>
+    <header id="header"></header>
+
+    <div class="container">
+        <div id="loginPrompt" style="text-align:center;padding:80px 20px">
+            <p style="font-size:18px;color:#999;margin-bottom:16px">请先登录后查看个人中心</p>
+            <button class="btn-save" onclick="document.getElementById('btnLogin').click()">去登录</button>
+        </div>
+
+        <div id="profileContent" style="display:none">
+            <!-- 头像 + 基本信息 -->
+            <div class="profile-card">
+                <div class="avatar-wrap">
+                    <img class="avatar-img" id="avatarImg" src="" alt="">
+                    <label class="avatar-edit" title="更换头像">📷<input type="file" accept="image/*" style="display:none" onchange="uploadAvatar(this)"></label>
+                </div>
+                <div class="profile-name" id="profileName">--</div>
+                <div class="profile-email" id="profileEmail">--</div>
+                <div class="profile-stats">
+                    <div class="profile-stat"><div class="num" id="statQuestions">0</div><div class="label">提问</div></div>
+                    <div class="profile-stat"><div class="num" id="statAnswers">0</div><div class="label">回答</div></div>
+                </div>
+
+                <div class="success-msg" id="successMsg"></div>
+
+                <div class="form-group">
+                    <label>昵称</label>
+                    <input type="text" id="editNickname" placeholder="设置昵称" maxlength="20">
+                </div>
+                <button class="btn-save" id="btnSave" onclick="saveProfile()">保存修改</button>
+            </div>
+
+            <!-- 我的帖子 -->
+            <div class="profile-card" style="text-align:left">
+                <h3 style="font-size:17px;margin-bottom:12px">我的提问</h3>
+                <div id="myQuestions"><span style="color:#999">加载中...</span></div>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer"></footer>
+
+    <script>
+        var currentUser = null;
+
+        function init() {
+            if (!window.supabaseClient) { setTimeout(init, 300); return; }
+            window.supabaseClient.auth.getSession().then(function(res) {
+                if (!res.data.session) {
+                    document.getElementById('loginPrompt').style.display = 'block';
+                    document.getElementById('profileContent').style.display = 'none';
+                    return;
+                }
+                currentUser = res.data.session.user;
+                document.getElementById('loginPrompt').style.display = 'none';
+                document.getElementById('profileContent').style.display = 'block';
+                loadProfile();
+            });
+        }
+
+        function loadProfile() {
+            // 基本信息
+            var meta = currentUser.user_metadata || {};
+            var nickname = meta.nickname || meta.name || currentUser.email.split('@')[0];
+            var avatar = meta.avatar_url || '';
+
+            document.getElementById('profileName').textContent = nickname;
+            document.getElementById('profileEmail').textContent = currentUser.email;
+            document.getElementById('editNickname').value = nickname;
+            if (avatar) {
+                document.getElementById('avatarImg').src = avatar;
+            } else {
+                document.getElementById('avatarImg').src = 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="80" height="80"><rect fill="#e6f7ff" width="80" height="80" rx="40"/><text fill="#1677ff" font-size="32" x="50%" y="55%" text-anchor="middle" font-family="sans-serif">' + nickname[0].toUpperCase() + '</text></svg>');
+            }
+
+            // 统计
+            window.supabaseClient.from('questions').select('id', { count: 'exact' }).eq('user_id', currentUser.id)
+                .then(function(res) { document.getElementById('statQuestions').textContent = res.count || 0; });
+            window.supabaseClient.from('answers').select('id', { count: 'exact' }).eq('user_id', currentUser.id)
+                .then(function(res) { document.getElementById('statAnswers').textContent = res.count || 0; });
+
+            // 我的提问列表
+            window.supabaseClient.from('questions').select('id,title,created_at')
+                .eq('user_id', currentUser.id).order('created_at', { ascending: false }).limit(20)
+                .then(function(res) {
+                    var div = document.getElementById('myQuestions');
+                    if (res.error || !res.data || res.data.length === 0) {
+                        div.innerHTML = '<span style="color:#999">暂无提问</span>'; return;
+                    }
+                    var html = '';
+                    res.data.forEach(function(q) {
+                        html += '<div class="my-post"><a href="community.html" target="_blank">' + escHtml(q.title) + '</a><span class="post-time">' + timeAgo(q.created_at) + '</span></div>';
+                    });
+                    div.innerHTML = html;
+                });
+        }
+
+        function uploadAvatar(input) {
+            var file = input.files[0];
+            if (!file) return;
+            if (file.size > 2 * 1024 * 1024) { alert('头像不能超过 2MB'); return; }
+            var ext = file.name.split('.').pop();
+            var filename = 'avatar-' + currentUser.id + '.' + ext;
+            window.supabaseClient.storage.from('community-images').upload(filename, file, { cacheControl: '3600', upsert: true })
+                .then(function(res) {
+                    if (res.error) { alert('上传失败: ' + res.error.message); return; }
+                    var url = window.supabaseClient.storage.from('community-images').getPublicUrl(filename).data.publicUrl;
+                    document.getElementById('avatarImg').src = url;
+                    // 保存到 user metadata
+                    window.supabaseClient.auth.updateUser({ data: { avatar_url: url, nickname: document.getElementById('editNickname').value } })
+                        .then(function() { showSuccess('头像已更新'); });
+                });
+        }
+
+        function saveProfile() {
+            var nickname = document.getElementById('editNickname').value.trim();
+            if (!nickname) { alert('请输入昵称'); return; }
+            var btn = document.getElementById('btnSave');
+            btn.disabled = true; btn.textContent = '保存中...';
+            window.supabaseClient.auth.updateUser({ data: { nickname: nickname } })
+                .then(function(res) {
+                    btn.disabled = false; btn.textContent = '保存修改';
+                    if (res.error) { alert('保存失败: ' + res.error.message); return; }
+                    document.getElementById('profileName').textContent = nickname;
+                    showSuccess('修改已保存');
+                });
+        }
+
+        function showSuccess(msg) {
+            var el = document.getElementById('successMsg');
+            el.textContent = msg;
+            el.style.display = 'block';
+            setTimeout(function() { el.style.display = 'none'; }, 2500);
+        }
+
+        function timeAgo(d) {
+            if (!d) return '';
+            var sec = Math.floor((new Date() - new Date(d)) / 1000);
+            if (sec < 60) return '刚刚';
+            if (sec < 3600) return Math.floor(sec/60) + '分钟前';
+            if (sec < 86400) return Math.floor(sec/3600) + '小时前';
+            if (sec < 2592000) return Math.floor(sec/86400) + '天前';
+            return new Date(d).toLocaleDateString('zh-CN');
+        }
+
+        function escHtml(s) {
+            var d = document.createElement('div');
+            d.textContent = s || '';
+            return d.innerHTML;
+        }
+
+        init();
+    </script>
+    <script src="supabase.js"></script>
+    <script src="common.js"></script>
+</body>
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>院校库 - 江苏专转本资讯网</title>
+    <meta name="description" content="江苏专转本招生院校大全：61所公办/民办本科院校信息汇总，含历年投档分区间、招生专业大类、学费参考，支持搜索、排序和筛选。">
+    <meta name="keywords" content="江苏专转本院校,公办本科,民办本科,专转本招生院校,南京晓庄学院,三江学院">
+    <meta property="og:title" content="江苏专转本院校库 - 公办民办院校大全">
+    <meta property="og:description" content="61所招生院校信息汇总，含投档分、招生大类，支持搜索排序筛选。">
+    <meta property="og:type" content="article">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .toolbar {
+            background: #f0f7ff;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .toolbar input {
+            flex: 1;
+            min-width: 180px;
+            padding: 9px 14px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .toolbar select {
+            padding: 9px 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            background: #fff;
+        }
+        .toolbar .toolbar-label {
+            font-size: 14px;
+            color: #666;
+            white-space: nowrap;
+        }
+        /* 统计条 */
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .stats-bar .stat-chip {
+            padding: 8px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            background: #fff;
+            border: 1px solid #e5e7eb;
+        }
+        .stats-bar .stat-chip.pub { color: #096dd9; border-color: #91caff; background: #e6f7ff; }
+        .stats-bar .stat-chip.pri { color: #d48806; border-color: #ffd591; background: #fff7e6; }
+        .stats-bar .stat-chip.stop { color: #cf1322; border-color: #ffa39e; background: #fff1f0; }
+        .school-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+            gap: 16px;
+        }
+        .school-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            background: #fff;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .school-card:hover {
+            box-shadow: 0 4px 16px #d0e3ff;
+            border-color: #1677ff;
+        }
+        .school-card .name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 4px;
+        }
+        .school-card .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .badge.public { background: #e6f7ff; color: #096dd9; }
+        .badge.private { background: #fff7e6; color: #d48806; }
+        .school-card .city-tag {
+            display: inline-block;
+            font-size: 11px;
+            color: #999;
+            margin-left: 4px;
+        }
+        .school-card .meta {
+            font-size: 13px;
+            color: #888;
+            margin: 8px 0;
+        }
+        .school-card .meta span { margin-right: 16px; }
+        .school-card .score-range {
+            font-size: 15px;
+            color: #333;
+            margin: 6px 0;
+        }
+        .school-card .score-range b {
+            color: #1677ff;
+            font-size: 18px;
+        }
+        .school-card .tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 10px;
+        }
+        .school-card .tag {
+            display: inline-block;
+            background: #f5f7fa;
+            color: #555;
+            padding: 3px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #eee;
+        }
+        .school-card .tag.more {
+            background: #fff;
+            color: #1677ff;
+            border: 1px dashed #1677ff;
+        }
+        /* 分数走势 */
+        .trend-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 8px;
+            height: 60px;
+            margin: 12px 0;
+            padding: 0 4px;
+        }
+        .trend-bar-wrap {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .trend-bar {
+            width: 100%;
+            max-width: 50px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.3s;
+            min-height: 4px;
+        }
+        .trend-bar.pub-bar { background: #1677ff; }
+        .trend-bar.pri-bar { background: #faad14; }
+        .trend-label {
+            font-size: 11px;
+            color: #999;
+        }
+        .trend-val {
+            font-size: 11px;
+            font-weight: bold;
+            color: #333;
+        }
+        /* 展开详情 */
+        .school-detail {
+            display: none;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px dashed #ddd;
+        }
+        .school-card.open .school-detail { display: block; }
+        .school-detail table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+        .school-detail table th,
+        .school-detail table td {
+            border: 1px solid #eee;
+            padding: 7px 10px;
+            text-align: center;
+        }
+        .school-detail table th { background: #fafafa; }
+        .school-detail .year-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 12px;
+        }
+        .school-detail .year-tab {
+            padding: 5px 14px;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            background: #fff;
+            color: #555;
+        }
+        .school-detail .year-tab.active {
+            background: #1677ff;
+            color: #fff;
+            border-color: #1677ff;
+        }
+        .no-result {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+            font-size: 16px;
+        }
+        @media (max-width:768px) {
+            .school-grid { grid-template-columns: 1fr; }
+            .toolbar { flex-direction: column; align-items: stretch; }
+            .toolbar input { min-width: auto; }
+        }
+    </style>
+</head>
+<body>
+    <header id="header"></header>
+
+    <div class="container">
+        <h2>本科院校大全</h2>
+
+        <!-- 统计条 -->
+        <div class="stats-bar" id="statsBar"></div>
+
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="搜索院校名称..." oninput="renderSchools()">
+            <select id="typeFilter" onchange="renderSchools()">
+                <option value="all">全部类型</option>
+                <option value="public">公办</option>
+                <option value="private">民办</option>
+            </select>
+            <select id="cityFilter" onchange="renderSchools()">
+                <option value="all">全部城市</option>
+            </select>
+            <select id="majorFilter" onchange="renderSchools()">
+                <option value="all">全部专业大类</option>
+            </select>
+            <select id="sortOrder" onchange="renderSchools()">
+                <option value="default">默认排序</option>
+                <option value="score-desc">投档分从高到低</option>
+                <option value="score-asc">投档分从低到高</option>
+                <option value="major-desc">专业大类从多到少</option>
+            </select>
+            <span class="toolbar-label" id="resultCount"></span>
+        </div>
+
+        <div class="school-grid" id="schoolGrid"></div>
+        <div class="no-result" id="noResult" style="display:none">没有匹配的院校，请调整筛选条件</div>
+    </div>
+
+    <footer id="footer"></footer>
+
+    <script>
+        var schoolList = [];
+        var dataReady = false;
+
+        fetch('scoreData.json')
+            .then(function(res) { return res.json(); })
+            .then(function(data) { buildSchoolData(data); })
+            .catch(function(err) { console.error('数据加载失败:', err); });
+
+        function buildSchoolData(data) {
+            var map = {};
+            data.forEach(function(item) {
+                if (!map[item.school]) {
+                    map[item.school] = {
+                        school: item.school,
+                        type: item.type,
+                        majors: {},
+                        allMajors: [],
+                        scoreByYear: {}
+                    };
+                }
+                var s = map[item.school];
+                if (!s.majors[item.major]) { s.majors[item.major] = []; }
+                s.majors[item.major].push(item);
+                if (!s.scoreByYear[item.y]) { s.scoreByYear[item.y] = { min: item.score, max: item.score }; }
+                else {
+                    var sy = s.scoreByYear[item.y];
+                    if (item.score < sy.min) sy.min = item.score;
+                    if (item.score > sy.max) sy.max = item.score;
+                }
+            });
+
+            var allMajors = {};
+            for (var k in map) {
+                if (!map.hasOwnProperty(k)) continue;
+                var s = map[k];
+                s.allMajors = Object.keys(s.majors).sort();
+                s.programCount = 0;
+                s.allMajors.forEach(function(m) {
+                    allMajors[m] = true;
+                    s.programCount += s.majors[m].length;
+                });
+                s.city = extractCity(s.school);
+                // 最低投档分（2026）
+                if (s.scoreByYear[2026]) {
+                    s.minScore = s.scoreByYear[2026].min;
+                    s.maxScore = s.scoreByYear[2026].max;
+                } else if (s.scoreByYear[2025]) {
+                    s.minScore = s.scoreByYear[2025].min;
+                    s.maxScore = s.scoreByYear[2025].max;
+                } else {
+                    s.minScore = 999; s.maxScore = 0;
+                }
+                schoolList.push(s);
+            }
+
+            schoolList.sort(function(a, b) {
+                if (a.type !== b.type) return a.type === 'public' ? -1 : 1;
+                return a.school.localeCompare(b.school, 'zh');
+            });
+
+            // 填充分类下拉框
+            var majorSel = document.getElementById('majorFilter');
+            Object.keys(allMajors).sort().forEach(function(m) {
+                var opt = document.createElement('option');
+                opt.value = m; opt.textContent = m;
+                majorSel.appendChild(opt);
+            });
+
+            // 填充城市下拉框
+            var cities = {};
+            schoolList.forEach(function(s) { if (s.city) cities[s.city] = true; });
+            var citySel = document.getElementById('cityFilter');
+            Object.keys(cities).sort().forEach(function(c) {
+                var opt = document.createElement('option');
+                opt.value = c; opt.textContent = c;
+                citySel.appendChild(opt);
+            });
+
+            dataReady = true;
+            updateStats();
+            renderSchools();
+        }
+
+        function extractCity(name) {
+            var cities = ['南京','苏州','无锡','常州','镇江','扬州','南通','徐州','盐城','泰州','淮安','宿迁','连云港'];
+            var found = '';
+            for (var i = 0; i < cities.length; i++) {
+                if (name.indexOf(cities[i]) !== -1) found = cities[i];
+            }
+            // 特殊映射：校名中不带城市名的学校
+            var map = {
+                '金陵': '南京', '淮阴': '淮安', '常熟': '苏州', '张家港': '苏州', '天平学院': '南京',
+                '三江学院': '南京', '东南大学': '南京',
+                '江苏大学京江学院': '镇江', '江苏大学': '镇江',
+                '江苏第二师范学院': '南京',
+                '江苏海洋大学': '连云港',
+                '江苏科技大学': '镇江',
+                '江苏理工学院': '常州',
+                '江苏师范大学科文学院': '徐州', '江苏师范大学': '徐州'
+            };
+            for (var k in map) {
+                if (map.hasOwnProperty(k) && name.indexOf(k) !== -1) { found = map[k]; }
+            }
+            return found;
+        }
+
+        function updateStats() {
+            var pub = 0, pri = 0, stop = 0;
+            schoolList.forEach(function(s) {
+                if (s.type === 'public') pub++;
+                else pri++;
+                if (!s.scoreByYear[2026]) stop++;
+            });
+            document.getElementById('statsBar').innerHTML =
+                '<span class="stat-chip pub">公办 ' + pub + ' 所</span>' +
+                '<span class="stat-chip pri">民办 ' + pri + ' 所</span>' +
+                '<span class="stat-chip stop">已停招 ' + stop + ' 所</span>';
+        }
+
+        function renderSchools() {
+            if (!dataReady) return;
+
+            var query = document.getElementById('searchInput').value.trim().toLowerCase();
+            var typeFilter = document.getElementById('typeFilter').value;
+            var cityFilter = document.getElementById('cityFilter').value;
+            var majorFilter = document.getElementById('majorFilter').value;
+            var sortOrder = document.getElementById('sortOrder').value;
+
+            var filtered = schoolList.filter(function(s) {
+                if (typeFilter !== 'all' && s.type !== typeFilter) return false;
+                if (cityFilter !== 'all' && s.city !== cityFilter) return false;
+                if (majorFilter !== 'all' && s.allMajors.indexOf(majorFilter) === -1) return false;
+                if (query && s.school.toLowerCase().indexOf(query) === -1) return false;
+                return true;
+            });
+
+            // 排序
+            if (sortOrder === 'score-desc') {
+                filtered.sort(function(a, b) { return b.minScore - a.minScore; });
+            } else if (sortOrder === 'score-asc') {
+                filtered.sort(function(a, b) { return a.minScore - b.minScore; });
+            } else if (sortOrder === 'major-desc') {
+                filtered.sort(function(a, b) { return b.allMajors.length - a.allMajors.length; });
+            }
+            // default: keep original order
+
+            document.getElementById('resultCount').textContent = '共 ' + filtered.length + ' 所';
+            document.getElementById('noResult').style.display = filtered.length === 0 ? 'block' : 'none';
+
+            var grid = document.getElementById('schoolGrid');
+            var html = '';
+            filtered.forEach(function(s) {
+                var isPublic = s.type === 'public';
+                var badgeClass = isPublic ? 'public' : 'private';
+                var badgeText = isPublic ? '公办' : '民办';
+
+                var scoreText = '';
+                if (s.scoreByYear[2026]) {
+                    var r = s.scoreByYear[2026];
+                    scoreText = r.min === r.max
+                        ? '2026投档分: <b>' + r.min + '</b>'
+                        : '2026投档分: <b>' + r.min + ' ~ ' + r.max + '</b>';
+                } else if (s.scoreByYear[2025]) {
+                    var r = s.scoreByYear[2025];
+                    scoreText = '2025投档分: <b>' + r.min + ' ~ ' + r.max + '</b> <span style="color:#999;font-size:12px">(停招)</span>';
+                } else {
+                    scoreText = '<span style="color:#999">暂无近年数据</span>';
+                }
+
+                var showMajors = s.allMajors.slice(0, 5);
+                var restCount = s.allMajors.length - showMajors.length;
+                var tagsHtml = showMajors.map(function(m) {
+                    return '<span class="tag">' + m + '</span>';
+                }).join('');
+                if (restCount > 0) { tagsHtml += '<span class="tag more">+' + restCount + '</span>'; }
+
+                var stopped = !s.scoreByYear[2026] ? ' <span style="background:#fff1f0;color:#cf1322;border:1px solid #ffa39e;padding:1px 8px;border-radius:4px;font-size:12px;font-weight:normal;margin-left:6px">停招</span>' : '';
+
+                html += '<div class="school-card" id="card-' + sanitizeId(s.school) + '" onclick="toggleDetail(\'' + sanitizeId(s.school) + '\')">';
+                html += '<span class="badge ' + badgeClass + '">' + badgeText + '</span>';
+                html += '<span class="name">' + s.school + stopped + '</span>';
+                if (s.city) { html += '<span class="city-tag">📍' + s.city + '</span>'; }
+                var url = getSchoolUrl(s.school);
+                if (url) { html += ' <a href="' + url + '" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="font-size:12px;color:#1677ff;text-decoration:none;margin-left:4px">🔗 官网</a>'; }
+                html += '<div class="meta"><span>' + s.allMajors.length + ' 个专业大类</span><span>' + s.programCount + ' 个招生专业</span></div>';
+                html += '<div class="score-range">' + scoreText + '</div>';
+                html += '<div class="tags">' + tagsHtml + '</div>';
+                html += '<div class="school-detail" id="detail-' + sanitizeId(s.school) + '"></div>';
+                html += '</div>';
+            });
+
+            grid.innerHTML = html;
+        }
+
+        function getSchoolUrl(name) {
+            var map = {
+                '南京信息工程大学': 'https://www.nuist.edu.cn',
+                '南京审计大学': 'https://www.nau.edu.cn',
+                '南京晓庄学院': 'https://www.njxzc.edu.cn',
+                '金陵科技学院': 'https://www.jit.edu.cn',
+                '南京邮电大学': 'https://www.njupt.edu.cn',
+                '南京工业大学': 'https://www.njtech.edu.cn',
+                '南京工程学院': 'https://www.njit.edu.cn',
+                '南京林业大学': 'https://www.njfu.edu.cn',
+                '南京特殊教育师范学院': 'https://www.njts.edu.cn',
+                '南京财经大学红山学院': 'https://hs.nufe.edu.cn',
+                '南京审计大学金审学院': 'https://www.naujsc.edu.cn',
+                '南京航空航天大学金城学院': 'https://jc.nuaa.edu.cn',
+                '南京理工大学紫金学院': 'https://zj.njust.edu.cn',
+                '南京理工大学泰州科技学院': 'https://www.nustti.edu.cn',
+                '南京师范大学泰州学院': 'https://www.njnutz.edu.cn',
+                '南京师范大学中北学院': 'https://www.nnudy.edu.cn',
+                '南京医科大学康达学院': 'https://kdc.njmu.edu.cn',
+                '南京邮电大学通达学院': 'https://tdxy.njupt.edu.cn',
+                '南京中医药大学翰林学院': 'https://hlxy.njucm.edu.cn',
+                '南京工业大学浦江学院': 'https://pjxy.njtech.edu.cn',
+                '南京传媒学院': 'https://www.cucn.edu.cn',
+                '南京工业职业技术大学': 'https://www.niit.edu.cn',
+                '江苏大学': 'https://www.ujs.edu.cn',
+                '江苏大学京江学院': 'https://jjxy.ujs.edu.cn',
+                '江苏第二师范学院': 'https://www.jssnu.edu.cn',
+                '江苏海洋大学': 'https://www.jou.edu.cn',
+                '江苏科技大学': 'https://www.just.edu.cn',
+                '江苏理工学院': 'https://www.jsut.edu.cn',
+                '江苏师范大学': 'https://www.jsnu.edu.cn',
+                '江苏师范大学科文学院': 'https://kwxy.jsnu.edu.cn',
+                '苏州大学应用技术学院': 'https://tec.suda.edu.cn',
+                '苏州城市学院': 'https://www.szcu.edu.cn',
+                '苏州科技大学': 'https://www.usts.edu.cn',
+                '苏州科技大学天平学院': 'https://tpxy.usts.edu.cn',
+                '苏州工学院': 'https://www.cslg.edu.cn',
+                '苏州职业技术大学': 'https://www.szpt.edu.cn',
+                '常州大学': 'https://www.cczu.edu.cn',
+                '常州大学怀德学院': 'https://hdc.cczu.edu.cn',
+                '常州工学院': 'https://www.czu.cn',
+                '无锡学院': 'https://www.wxmc.edu.cn',
+                '无锡太湖学院': 'https://www.wxthxy.edu.cn',
+                '无锡职业技术大学': 'https://www.wxit.edu.cn',
+                '扬州大学': 'https://www.yzu.edu.cn',
+                '扬州大学广陵学院': 'https://glxy.yzu.edu.cn',
+                '扬州职业技术大学': 'https://www.yzpc.edu.cn',
+                '南通大学': 'https://www.ntu.edu.cn',
+                '南通理工学院': 'https://www.ntit.edu.cn',
+                '盐城工学院': 'https://www.ycit.edu.cn',
+                '盐城师范学院': 'https://www.yctu.edu.cn',
+                '淮阴师范学院': 'https://www.hytc.edu.cn',
+                '淮安大学': 'https://www.hyit.edu.cn',
+                '徐州医科大学': 'https://www.xzhmu.edu.cn',
+                '徐州工程学院': 'https://www.xzit.edu.cn',
+                '宿迁学院': 'https://www.squ.edu.cn',
+                '泰州学院': 'https://www.tzu.edu.cn',
+                '三江学院': 'https://www.sju.edu.cn',
+                '东南大学成贤学院': 'https://cxxy.seu.edu.cn',
+                '南京艺术学院': 'https://www.nua.edu.cn'
+            };
+            return map[name] || '';
+        }
+
+        function sanitizeId(name) {
+            return name.replace(/[（()）]/g, '').replace(/\s/g, '');
+        }
+
+        function toggleDetail(id) {
+            var card = document.getElementById('card-' + id);
+            var detail = document.getElementById('detail-' + id);
+            if (!card || !detail) return;
+            if (card.classList.contains('open')) { card.classList.remove('open'); return; }
+
+            var schoolData = null;
+            for (var i = 0; i < schoolList.length; i++) {
+                if (sanitizeId(schoolList[i].school) === id) { schoolData = schoolList[i]; break; }
+            }
+            if (!schoolData) return;
+
+            var years = Object.keys(schoolData.scoreByYear).sort(function(a, b) { return b - a; });
+
+            var h = '';
+            // 分数趋势图
+            h += '<div style="font-size:13px;color:#888;margin-bottom:8px">历年最低投档分走势</div>';
+            h += buildTrendBars(schoolData, years);
+
+            // 年份 tabs
+            if (years.length > 1) {
+                h += '<div class="year-tabs">';
+                years.forEach(function(y, idx) {
+                    h += '<span class="year-tab' + (idx === 0 ? ' active' : '') + '" onclick="event.stopPropagation();switchYear(\'' + id + '\',' + y + ')">' + y + '年</span>';
+                });
+                h += '</div>';
+            }
+
+            var showYear = years[0] || 2026;
+            h += '<div id="table-' + id + '">' + buildYearTable(schoolData, showYear) + '</div>';
+
+            detail.innerHTML = h;
+            card.classList.add('open');
+        }
+
+        function buildTrendBars(schoolData, years) {
+            if (years.length === 0) return '';
+            var allScores = [];
+            years.forEach(function(y) {
+                allScores.push(schoolData.scoreByYear[y].min);
+                allScores.push(schoolData.scoreByYear[y].max);
+            });
+            var globalMin = Math.min.apply(null, allScores);
+            var globalMax = Math.max.apply(null, allScores);
+            var range = globalMax - globalMin || 1;
+            var isPublic = schoolData.type === 'public';
+
+            var h = '<div class="trend-bars">';
+            years.reverse(); // 从旧到新：2023, 2024, 2025, 2026
+            years.forEach(function(y) {
+                var r = schoolData.scoreByYear[y];
+                var hPct = Math.max(10, Math.round((r.min - globalMin) / range * 100));
+                var barClass = isPublic ? 'pub-bar' : 'pri-bar';
+                h += '<div class="trend-bar-wrap">';
+                h += '<span class="trend-val">' + r.min + '</span>';
+                h += '<div class="trend-bar ' + barClass + '" style="height:' + hPct + 'px" title="' + y + '年最低 ' + r.min + '"></div>';
+                h += '<span class="trend-label">' + y + '</span>';
+                h += '</div>';
+            });
+            h += '</div>';
+            return h;
+        }
+
+        function switchYear(id, year) {
+            var tabs = document.querySelectorAll('#detail-' + id + ' .year-tab');
+            for (var i = 0; i < tabs.length; i++) {
+                tabs[i].classList.remove('active');
+                if (tabs[i].textContent === year + '年') { tabs[i].classList.add('active'); }
+            }
+            var schoolData = null;
+            for (var i = 0; i < schoolList.length; i++) {
+                if (sanitizeId(schoolList[i].school) === id) { schoolData = schoolList[i]; break; }
+            }
+            if (schoolData) {
+                document.getElementById('table-' + id).innerHTML = buildYearTable(schoolData, year);
+            }
+        }
+
+        function buildYearTable(schoolData, year) {
+            var rows = [];
+            var allMajors = Object.keys(schoolData.majors).sort();
+            allMajors.forEach(function(major) {
+                schoolData.majors[major].forEach(function(item) {
+                    if (item.y == year) { rows.push(item); }
+                });
+            });
+            if (rows.length === 0) { return '<p style="color:#999;padding:12px">该年份暂无数据</p>'; }
+
+            var h = '<table>';
+            h += '<tr><th>专业大类</th><th>招生专业</th><th>类型</th><th>投档分</th><th>操作</th></tr>';
+            rows.sort(function(a, b) { return b.score - a.score; });
+            rows.forEach(function(item) {
+                h += '<tr>';
+                h += '<td>' + item.major + '</td>';
+                h += '<td>' + item.pro + '</td>';
+                h += '<td>' + (item.type === 'public' ? '公办' : '民办') + '</td>';
+                h += '<td><b>' + item.score + '</b></td>';
+                h += '<td><a href="score.html?year=' + item.y + '&school=' + encodeURIComponent(item.school) + '" style="color:#1677ff;font-size:12px" onclick="event.stopPropagation()">查分数线 →</a></td>';
+                h += '</tr>';
+            });
+            h += '</table>';
+            return h;
+        }
+    </script>
+    <script src="supabase.js"></script>
+    <script src="common.js"></script>
+</body>
+</html>

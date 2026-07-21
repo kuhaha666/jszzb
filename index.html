@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>江苏专转本资讯网 - 政策|分数线|真题|志愿填报</title>
+    <meta name="description" content="江苏专转本资讯平台，提供最新政策文件、历年投档分数线查询、免费真题资料下载、志愿填报冲稳保测算工具，助力专科生顺利升入公办本科。">
+    <meta name="keywords" content="江苏专转本,专转本政策,专转本分数线,专转本真题,志愿填报,专转本院校,公办本科">
+    <meta name="author" content="江苏专转本资讯网">
+    <meta property="og:title" content="江苏专转本资讯平台 - 政策|分数线|真题|志愿填报">
+    <meta property="og:description" content="提供最新政策文件、历年投档分数线查询、免费真题资料下载、志愿填报冲稳保测算工具。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://jszzb.example.com/">
+    <meta property="og:locale" content="zh_CN">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        /* 首页特有样式 */
+        .hero {
+            background: linear-gradient(135deg, #1677ff 0%, #0958d9 40%, #003eb3 100%);
+            color: #fff;
+            padding: 40px 32px 36px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        .hero h2 {
+            color: #fff;
+            border: none;
+            padding: 0;
+            font-size: 26px;
+            margin-bottom: 8px;
+        }
+        .hero .hero-sub {
+            font-size: 15px;
+            opacity: 0.85;
+            margin-bottom: 24px;
+        }
+        .hero .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 32px;
+            flex-wrap: wrap;
+        }
+        .hero .stat-item {
+            text-align: center;
+        }
+        .hero .stat-num {
+            font-size: 32px;
+            font-weight: bold;
+            line-height: 1.2;
+        }
+        .hero .stat-label {
+            font-size: 13px;
+            opacity: 0.75;
+        }
+        .hero .stat-divider {
+            width: 1px;
+            background: rgba(255,255,255,0.25);
+        }
+        /* 功能卡片 */
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .feature-card {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(22,119,255,0.15);
+            border-color: #1677ff;
+        }
+        .feature-card .icon {
+            font-size: 36px;
+            margin-bottom: 12px;
+        }
+        .feature-card h3 {
+            color: #222;
+            font-size: 17px;
+            margin-bottom: 8px;
+        }
+        .feature-card p {
+            color: #888;
+            font-size: 13px;
+            line-height: 1.6;
+            margin: 0;
+        }
+        /* 公告栏 */
+        .notice-bar {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            border-radius: 8px;
+            padding: 14px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+        }
+        .notice-bar .notice-tag {
+            background: #ff4d4f;
+            color: #fff;
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+        .notice-bar span {
+            color: #8c6d00;
+        }
+        .notice-bar a {
+            color: #1677ff;
+            margin-left: 4px;
+        }
+        /* 底部推荐 */
+        .quick-links {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+            margin-top: 24px;
+        }
+        .quick-link {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: #fafafa;
+        }
+        .quick-link:hover {
+            background: #f0f7ff;
+            border-color: #1677ff;
+        }
+        .quick-link .ql-icon {
+            font-size: 22px;
+            margin-bottom: 6px;
+        }
+        .quick-link strong {
+            display: block;
+            font-size: 15px;
+            color: #222;
+            margin-bottom: 4px;
+        }
+        .quick-link span {
+            font-size: 13px;
+            color: #999;
+        }
+        @media (max-width:768px) {
+            .feature-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .quick-links {
+                grid-template-columns: 1fr;
+            }
+            .hero .stats-row {
+                gap: 16px;
+            }
+            .hero .stat-num {
+                font-size: 24px;
+            }
+            .hero .stat-divider {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header id="header"></header>
+
+    <div class="container">
+        <!-- 顶部数据概览 -->
+        <div class="hero">
+            <h2>江苏专转本一站式备考平台</h2>
+            <p class="hero-sub">政策解读 · 分数线查询 · 真题资料 · 志愿填报 —— 专转本路上，我们陪你上岸</p>
+            <div class="stats-row">
+                <div class="stat-item">
+                    <div class="stat-num">1,960</div>
+                    <div class="stat-label">条投档数据</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-num">61</div>
+                    <div class="stat-label">所招生院校</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-num">19</div>
+                    <div class="stat-label">个专业大类</div>
+                </div>
+                <div class="stat-divider"></div>
+                <div class="stat-item">
+                    <div class="stat-num">4</div>
+                    <div class="stat-label">年完整数据</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 公告 -->
+        <div class="notice-bar">
+            <span class="notice-tag">更新</span>
+            <span>2026年投档线数据已全面更新，覆盖54所招生院校、512个专业组。院校库新增"停招"标识。</span>
+            <a href="score.html">立即查询 →</a>
+        </div>
+
+        <!-- 主要功能 -->
+        <h2 style="margin-top:28px">核心功能</h2>
+        <div class="feature-grid">
+            <div class="feature-card" onclick="location.href='score.html'">
+                <div class="icon">📊</div>
+                <h3>分数线查询</h3>
+                <p>2023-2026四年数据<br>按年份、院校、专业大类灵活筛选</p>
+            </div>
+            <div class="feature-card" onclick="location.href='school.html'">
+                <div class="icon">🏫</div>
+                <h3>院校库</h3>
+                <p>61所招生院校全方位对比<br>投档分区间、招生专业一目了然</p>
+            </div>
+            <div class="feature-card" onclick="location.href='volunteer.html'">
+                <div class="icon">🎯</div>
+                <h3>志愿测算</h3>
+                <p>输入分数智能匹配冲稳保<br>基于真实数据，拒绝拍脑袋</p>
+            </div>
+            <div class="feature-card" onclick="location.href='resource.html'">
+                <div class="icon">📚</div>
+                <h3>真题资料</h3>
+                <p>官方资源入口 + 搜索指南<br>备考资料收集清单逐项对照</p>
+            </div>
+            <div class="feature-card" onclick="location.href='community.html'">
+                <div class="icon">💬</div>
+                <h3>问答社区</h3>
+                <p>选校择校、备考交流、资料分享<br>专转本考生互助答疑平台</p>
+            </div>
+        </div>
+
+        <!-- 快速入口 -->
+        <h2>更多工具</h2>
+        <div class="quick-links">
+            <div class="quick-link" onclick="location.href='policy.html'">
+                <div class="ql-icon">📋</div>
+                <strong>2026 最新政策</strong>
+                <span>报考条件、考试科目、退役士兵专项计划</span>
+            </div>
+            <div class="quick-link" onclick="location.href='study.html'">
+                <div class="ql-icon">📝</div>
+                <strong>全年备考规划</strong>
+                <span>大一到大三完整备考节奏、各科学习方法</span>
+            </div>
+            <div class="quick-link" onclick="location.href='school.html'">
+                <div class="ql-icon">🔍</div>
+                <strong>院校对比筛选</strong>
+                <span>按分类、专业大类快速定位目标院校</span>
+            </div>
+        </div>
+    </div>
+
+    <footer id="footer"></footer>
+    <script src="supabase.js"></script>
+    <script src="common.js"></script>
+</body>
+</html>

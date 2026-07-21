@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分数线查询 - 江苏专转本资讯网</title>
+    <meta name="description" content="江苏专转本2023-2025年历年投档分数线数据库，支持按年份、院校类型、专业大类筛选，快速查询公办民办院校最低投档分。">
+    <meta name="keywords" content="江苏专转本分数线,专转本投档线,2025专转本分数线,公办本科分数线,民办本科分数线,专转本录取分数">
+    <meta property="og:title" content="江苏专转本历年分数线查询">
+    <meta property="og:description" content="2023-2025年投档分数线数据库，支持年份、院校类型、专业大类多维度筛选。">
+    <meta property="og:type" content="article">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .filter-box {
+            background: #f0f7ff;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        select, button {
+            padding: 8px 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        button {
+            background: #1677ff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table th, table td {
+            border: 1px solid #eee;
+            padding: 12px;
+            text-align: center;
+        }
+        table th {
+            background: #e8f3ff;
+        }
+        @media (max-width:768px) {
+            table th, table td { padding: 6px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <header id="header"></header>
+
+    <div class="container">
+        <h2>历年投档分数线数据库</h2>
+        <div class="filter-box">
+            <label>选择年份：</label>
+            <select id="yearSel">
+                <option value="2026">2026</option>
+                <option value="2025">2025</option>
+                <option value="2024">2024</option>
+                <option value="2023">2023</option>
+            </select>
+            <label>院校类型：</label>
+            <select id="typeSel">
+                <option value="all">全部</option>
+                <option value="public">公办</option>
+                <option value="private">民办</option>
+            </select>
+            <label>专业大类：</label>
+            <select id="majorSel">
+                <option value="all">全部</option>
+                <option value="财经类">财经类</option>
+                <option value="电子信息类">电子信息类</option>
+                <option value="法学类">法学类</option>
+                <option value="管理类(理)">管理类(理)</option>
+                <option value="管理类(文)">管理类(文)</option>
+                <option value="化工生物类">化工生物类</option>
+                <option value="机械工程类">机械工程类</option>
+                <option value="计算机类">计算机类</option>
+                <option value="教育类">教育类</option>
+                <option value="美术设计类">美术设计类</option>
+                <option value="农林类">农林类</option>
+                <option value="日语类">日语类</option>
+                <option value="食品类">食品类</option>
+                <option value="土木建筑类">土木建筑类</option>
+                <option value="文史类">文史类</option>
+                <option value="新闻传播类">新闻传播类</option>
+                <option value="医护类(理)">医护类(理)</option>
+                <option value="医护类(文)">医护类(文)</option>
+                <option value="音乐类">音乐类</option>
+                <option value="英语类">英语类</option>
+                <option value="资源环境类">资源环境类</option>
+            </select>
+            <button onclick="showScore()">查询分数线</button>
+        </div>
+
+        <div class="card">
+            <h3>查询结果</h3>
+            <table id="scoreTable">
+                <tr>
+                    <th>院校名称</th>
+                    <th>院校类型</th>
+                    <th>专业大类</th>
+                    <th>招生专业</th>
+                    <th>最低投档分</th>
+                </tr>
+            </table>
+        </div>
+
+        <div class="card">
+            <h3>分数段冲稳保参考</h3>
+            <p>260分以上：冲刺优质公办；220-260：稳妥普通公办；180-220：民办保底区间</p>
+        </div>
+    </div>
+
+    <footer id="footer"></footer>
+
+	<script>
+		let scoreData = [];
+		let dataReady = false;
+
+		fetch('scoreData.json')
+		.then(function(res){ return res.json(); })
+		.then(function(data){
+			scoreData = data;
+			dataReady = true;
+		})
+		.catch(function(err){ console.error('数据加载失败:', err); });
+
+		function showScore(){
+			if(!dataReady){ alert('数据加载中，请稍候...'); return; }
+			const y = document.getElementById("yearSel").value;
+			const t = document.getElementById("typeSel").value;
+			const m = document.getElementById("majorSel").value;
+			const table = document.getElementById("scoreTable");
+			while(table.rows.length > 1){
+				table.deleteRow(1);
+			}
+			let list = scoreData.filter(item => item.y == y);
+			if(t !== "all"){
+				list = list.filter(item => item.type == t);
+			}
+			if(m !== "all"){
+				list = list.filter(item => item.major == m);
+			}
+			// 按分数从高到低排序
+			list.sort((a, b) => b.score - a.score);
+			list.forEach(item=>{
+				const tr = document.createElement("tr");
+				tr.innerHTML = `
+					<td>${item.school}</td>
+					<td>${item.type==="public"?"公办":"民办"}</td>
+					<td>${item.major}</td>
+					<td>${item.pro}</td>
+					<td>${item.score}</td>
+				`;
+				table.appendChild(tr);
+		})
+		}
+	</script>
+  <script src="supabase.js"></script>
+  <script src="common.js"></script>
+</body>
+</html>

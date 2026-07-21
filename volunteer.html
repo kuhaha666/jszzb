@@ -1,0 +1,307 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>志愿填报工具 - 江苏专转本资讯网</title>
+    <meta name="description" content="江苏专转本志愿填报智能测算工具，输入预估分数一键匹配冲稳保院校，基于2023-2026年真实投档线数据精准测算。">
+    <meta name="keywords" content="江苏专转本志愿填报,专转本志愿测算,专转本冲稳保,专转本志愿排序">
+    <meta property="og:title" content="江苏专转本志愿填报测算工具">
+    <meta property="og:description" content="输入分数一键匹配冲稳保院校，基于历年真实投档线数据。">
+    <meta property="og:type" content="article">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .input-box {
+            background: #f0f7ff;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .input-box label {
+            font-size: 15px;
+        }
+        .input-box input, .input-box select {
+            padding: 8px 12px;
+            font-size: 15px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+        .input-box input {
+            width: 160px;
+        }
+        .input-box button {
+            padding: 10px 24px;
+            background: #1677ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .input-box button:hover {
+            background: #0958d9;
+        }
+        .tip {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 14px;
+            color: #8c6d00;
+        }
+        .result-section {
+            margin-top: 20px;
+        }
+        .result-section h3 {
+            padding: 8px 14px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-size: 17px;
+        }
+        .result-section h3.reach {
+            background: #fff1f0;
+            color: #cf1322;
+            border-left: 4px solid #cf1322;
+        }
+        .result-section h3.match {
+            background: #f6ffed;
+            color: #389e0d;
+            border-left: 4px solid #389e0d;
+        }
+        .result-section h3.safety {
+            background: #e6f7ff;
+            color: #096dd9;
+            border-left: 4px solid #096dd9;
+        }
+        .result-section table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+        }
+        .result-section table th,
+        .result-section table td {
+            border: 1px solid #eee;
+            padding: 10px 12px;
+            text-align: center;
+            font-size: 14px;
+        }
+        .result-section table th {
+            background: #fafafa;
+            font-weight: bold;
+        }
+        .gap-neg { color: #cf1322; }
+        .gap-pos { color: #389e0d; }
+        .summary {
+            padding: 16px;
+            border-radius: 8px;
+            background: #f8f8f8;
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-size: 15px;
+        }
+        @media (max-width:768px) {
+            .input-box { flex-direction: column; align-items: flex-start; }
+            .input-box input, .input-box select { width: 100%; }
+            .result-section table th, .result-section table td { padding: 6px; font-size: 12px; }
+        }
+    </style>
+</head>
+<body>
+    <header id="header"></header>
+
+    <div class="container">
+        <h2>志愿填报分数测算</h2>
+
+        <div class="tip">
+            <strong>使用说明：</strong>输入你的预估总分，选择年份和专业大类，系统将基于当年真实投档线数据自动匹配冲稳保院校。
+            冲稳保规则：<b>冲刺</b>（差5~30分内）| <b>稳妥</b>（±5分左右）| <b>保底</b>（高出10分以上）。
+        </div>
+
+        <div class="input-box">
+            <label>预估总分：</label>
+            <input type="number" id="scoreInput" placeholder="例如：350" min="100" max="500">
+            <label>参考年份：</label>
+            <select id="yearSel">
+                <option value="2026">2026年</option>
+                <option value="2025">2025年</option>
+                <option value="2024">2024年</option>
+                <option value="2023">2023年</option>
+            </select>
+            <label>专业大类：</label>
+            <select id="majorSel">
+                <option value="all">全部</option>
+                <option value="财经类">财经类</option>
+                <option value="电子信息类">电子信息类</option>
+                <option value="法学类">法学类</option>
+                <option value="管理类(理)">管理类(理)</option>
+                <option value="管理类(文)">管理类(文)</option>
+                <option value="化工生物类">化工生物类</option>
+                <option value="机械工程类">机械工程类</option>
+                <option value="计算机类">计算机类</option>
+                <option value="教育类">教育类</option>
+                <option value="美术设计类">美术设计类</option>
+                <option value="农林类">农林类</option>
+                <option value="日语类">日语类</option>
+                <option value="食品类">食品类</option>
+                <option value="土木建筑类">土木建筑类</option>
+                <option value="文史类">文史类</option>
+                <option value="新闻传播类">新闻传播类</option>
+                <option value="医护类(理)">医护类(理)</option>
+                <option value="医护类(文)">医护类(文)</option>
+                <option value="音乐类">音乐类</option>
+                <option value="英语类">英语类</option>
+                <option value="资源环境类">资源环境类</option>
+            </select>
+            <button onclick="calcVolunteer()">智能匹配院校</button>
+        </div>
+
+        <div class="card">
+            <h3>匹配结果</h3>
+            <div id="resBox">
+                <p>请输入预估分数后点击"智能匹配院校"</p>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>8个志愿排序建议</h3>
+            <p>建议搭配：<b>2-3个冲刺 + 3-4个稳妥 + 2-3个保底</b>；勾选服从调剂可降低退档风险；公办优先放前面，民办做兜底。</p>
+        </div>
+    </div>
+
+    <footer id="footer"></footer>
+
+    <script>
+        // 加载分数线数据
+        var scoreData = [];
+        var dataReady = false;
+
+        fetch('scoreData.json')
+            .then(function(res) { return res.json(); })
+            .then(function(data) {
+                scoreData = data;
+                dataReady = true;
+            })
+            .catch(function(err) { console.error('数据加载失败:', err); });
+
+        function calcVolunteer() {
+            if (!dataReady) { alert('数据加载中，请稍候...'); return; }
+
+            var userScore = Number(document.getElementById('scoreInput').value);
+            var year = Number(document.getElementById('yearSel').value);
+            var major = document.getElementById('majorSel').value;
+            var box = document.getElementById('resBox');
+
+            if (isNaN(userScore) || userScore < 100 || userScore > 500) {
+                box.innerHTML = '<p style="color:#cf1322">请输入 100~500 之间的有效总分</p>';
+                return;
+            }
+
+            // 按年份和（可选）专业大类筛选
+            var list = scoreData.filter(function(item) {
+                if (item.y !== year) return false;
+                if (major !== 'all' && item.major !== major) return false;
+                return true;
+            });
+
+            if (list.length === 0) {
+                box.innerHTML = '<p>该年份和专业大类暂无数据，请调整筛选条件。</p>';
+                return;
+            }
+
+            // 对每个学校取最低投档分（同一学校同一专业大类可能多个专业）
+            // 按学校+专业大类分组，取最低分作为该学校该大类的参考线
+            var schoolMap = {};
+            list.forEach(function(item) {
+                var key = item.school + '|' + item.major;
+                if (!schoolMap[key] || item.score < schoolMap[key].score) {
+                    schoolMap[key] = item;
+                }
+            });
+
+            var schools = [];
+            for (var k in schoolMap) {
+                if (schoolMap.hasOwnProperty(k)) {
+                    schools.push(schoolMap[k]);
+                }
+            }
+
+            // 计算差距并分类
+            var reach = [];   // 冲刺
+            var match = [];   // 稳妥
+            var safety = [];  // 保底
+
+            schools.forEach(function(item) {
+                var gap = userScore - item.score;
+                if (gap < -30) {
+                    // 差距太大，不现实
+                    return;
+                } else if (gap < -5) {
+                    reach.push({ item: item, gap: gap });
+                } else if (gap <= 10) {
+                    match.push({ item: item, gap: gap });
+                } else {
+                    safety.push({ item: item, gap: gap });
+                }
+            });
+
+            // 各组内按差距排序：冲（差距从小到大=从易到难），稳和保（差距从大到小=从稳到更稳）
+            reach.sort(function(a, b) { return b.gap - a.gap; });  // -5 排前面（最容易冲的）
+            match.sort(function(a, b) { return b.gap - a.gap; }); // 正差距排前面
+            safety.sort(function(a, b) { return b.gap - a.gap; }); // 差距大的排前面（最保险）
+
+            // 渲染结果
+            var html = '';
+
+            // 摘要
+            html += '<div class="summary">';
+            html += '<strong>你的预估分：' + userScore + ' 分 | 参考年份：' + year + ' 年</strong><br>';
+            html += '共匹配 <b>' + (reach.length + match.length + safety.length) + '</b> 个院校专业组：';
+            html += '<span style="color:#cf1322">冲刺 ' + reach.length + '</span> 个 | ';
+            html += '<span style="color:#389e0d">稳妥 ' + match.length + '</span> 个 | ';
+            html += '<span style="color:#096dd9">保底 ' + safety.length + '</span> 个';
+            if (major !== 'all') {
+                html += ' | 筛选大类：' + major;
+            }
+            html += '</div>';
+
+            // 冲刺
+            html += renderGroup('冲刺院校 — 需要超常发挥或分数线下降', 'reach', reach);
+            // 稳妥
+            html += renderGroup('稳妥院校 — 正常发挥有望录取', 'match', match);
+            // 保底
+            html += renderGroup('保底院校 — 录取把握较大', 'safety', safety);
+
+            box.innerHTML = html;
+        }
+
+        function renderGroup(title, cssClass, items) {
+            if (items.length === 0) return '';
+            var h = '<div class="result-section">';
+            h += '<h3 class="' + cssClass + '">' + title + '（' + items.length + '个）</h3>';
+            h += '<table>';
+            h += '<tr><th>院校名称</th><th>类型</th><th>专业大类</th><th>招生专业</th><th>投档分</th><th>差距</th></tr>';
+            items.forEach(function(entry) {
+                var gapText = (entry.gap >= 0 ? '+' : '') + entry.gap;
+                var gapClass = entry.gap >= 0 ? 'gap-pos' : 'gap-neg';
+                h += '<tr>';
+                h += '<td>' + entry.item.school + '</td>';
+                h += '<td>' + (entry.item.type === 'public' ? '公办' : '民办') + '</td>';
+                h += '<td>' + entry.item.major + '</td>';
+                h += '<td>' + entry.item.pro + '</td>';
+                h += '<td><b>' + entry.item.score + '</b></td>';
+                h += '<td class="' + gapClass + '"><b>' + gapText + '</b></td>';
+                h += '</tr>';
+            });
+            h += '</table></div>';
+            return h;
+        }
+    </script>
+    <script src="supabase.js"></script>
+  <script src="common.js"></script>
+</body>
+</html>

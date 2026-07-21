@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问答社区 - 江苏专转本资讯网</title>
+    <meta name="description" content="江苏专转本考生问答社区：备考经验、志愿填报、院校选择问题交流，考生互助答疑。">
+    <meta name="keywords" content="江苏专转本问答,专转本备考,专转本交流,专转本社区">
+    <meta property="og:title" content="江苏专转本问答社区">
+    <meta property="og:description" content="备考经验、志愿填报、院校选择问题交流互助。">
+    <meta property="og:type" content="article">
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .community-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .btn-ask {
+            padding: 10px 22px;
+            background: #1677ff;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            cursor: pointer;
+            transition: background 0.2s;
+            white-space: nowrap;
+        }
+        .btn-ask:hover { background: #0958d9; }
+        .btn-ask:disabled { background: #ccc; cursor: not-allowed; }
+        /* 分类标签 */
+        .category-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #eee;
+        }
+        .cat-tab {
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border: 1px solid #e5e7eb;
+            background: #fff;
+            color: #666;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .cat-tab:hover {
+            border-color: #1677ff;
+            color: #1677ff;
+        }
+        .cat-tab.active {
+            background: #1677ff;
+            color: #fff;
+            border-color: #1677ff;
+        }
+        .cat-tab .count {
+            font-size: 11px;
+            margin-left: 2px;
+            opacity: 0.7;
+        }
+        /* 问题列表 */
+        .q-list { margin-bottom: 24px; }
+        .q-item {
+            background: #fff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .q-item:hover {
+            border-color: #1677ff;
+            box-shadow: 0 2px 12px rgba(22,119,255,0.1);
+        }
+        .q-item .q-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #222;
+            margin-bottom: 8px;
+        }
+        .q-item .q-title .q-cat {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: normal;
+            padding: 2px 8px;
+            border-radius: 10px;
+            margin-right: 6px;
+            vertical-align: middle;
+        }
+        .q-item .q-meta {
+            font-size: 13px;
+            color: #999;
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+        }
+        .q-item .q-meta span { white-space: nowrap; }
+        .q-item .q-meta .ans-count {
+            background: #f0f7ff;
+            color: #1677ff;
+            padding: 1px 10px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        .q-item .has-img { color: #fa8c16; font-size: 12px; }
+        /* 内容中的图片 */
+        .content-img {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 8px;
+            margin: 8px 0;
+            cursor: pointer;
+            border: 1px solid #eee;
+        }
+        .content-text {
+            color: #555;
+            line-height: 1.7;
+            white-space: pre-wrap;
+            margin-bottom: 12px;
+            word-break: break-all;
+        }
+        /* 模态框 */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 9998;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 40px;
+            overflow-y: auto;
+        }
+        .modal-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 28px;
+            width: 90%;
+            max-width: 700px;
+            margin-bottom: 60px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+        }
+        .modal-box .close-btn {
+            float: right;
+            font-size: 24px;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+            margin: -8px -4px 0 0;
+        }
+        .modal-box .close-btn:hover { color: #333; }
+        .modal-box h3 { color: #222; margin-bottom: 16px; font-size: 19px; }
+        .modal-box h4 { color: #222; margin-bottom: 12px; font-size: 16px; }
+        .modal-box textarea,
+        .modal-box input[type="text"],
+        .modal-box select {
+            width: 100%;
+            padding: 12px;
+            font-size: 15px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+            font-family: inherit;
+        }
+        .modal-box textarea { min-height: 100px; resize: vertical; }
+        .modal-box textarea:focus,
+        .modal-box input[type="text"]:focus,
+        .modal-box select:focus {
+            border-color: #1677ff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(22,119,255,0.1);
+        }
+        .modal-box .btn-submit {
+            padding: 10px 24px;
+            background: #1677ff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            cursor: pointer;
+        }
+        .modal-box .btn-submit:hover { background: #0958d9; }
+        .modal-box .btn-submit:disabled { background: #93c0f5; cursor: not-allowed; }
+        /* 图片上传 */
+        .img-upload-area { margin-bottom: 10px; }
+        .btn-img {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 6px 14px;
+            border: 1px dashed #bbb;
+            background: #fafafa;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #666;
+            transition: all 0.2s;
+        }
+        .btn-img:hover { border-color: #1677ff; color: #1677ff; background: #f0f7ff; }
+        .img-preview-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 8px;
+        }
+        .img-preview-row .preview-item {
+            position: relative;
+            display: inline-block;
+        }
+        .img-preview-row .preview-item img {
+            height: 60px;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+        }
+        .img-preview-row .preview-item .remove-img {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background: #cf1322;
+            color: #fff;
+            border: none;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 11px;
+            cursor: pointer;
+            line-height: 18px;
+            text-align: center;
+        }
+        .upload-progress { font-size: 13px; color: #1677ff; margin-left: 6px; }
+        /* 回答 */
+        .answer-item {
+            border-top: 1px solid #f0f0f0;
+            padding: 16px 0;
+        }
+        .answer-item .a-meta {
+            font-size: 12px;
+            color: #999;
+            margin-top: 8px;
+        }
+        .answer-item .btn-del {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .answer-item .btn-del:hover { color: #cf1322; }
+        .no-answer { text-align: center; padding: 30px; color: #bbb; font-size: 14px; }
+        .loading { text-align: center; padding: 40px; color: #999; }
+        .q-detail-meta { font-size: 12px; color: #999; margin-bottom: 20px; }
+        .q-detail-meta .btn-del {
+            background: none;
+            border: none;
+            color: #ccc;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 8px;
+        }
+        .q-detail-meta .btn-del:hover { color: #cf1322; }
+        @media (max-width:768px) {
+            .modal-box { padding: 18px; margin: 20px; }
+            .category-tabs { gap: 6px; }
+            .cat-tab { padding: 5px 12px; font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <header id="header"></header>
+
+    <div class="container">
+        <div class="community-header">
+            <h2 style="margin-bottom:0">问答社区</h2>
+            <button class="btn-ask" id="btnAsk" disabled onclick="showAskModal()">我要提问</button>
+        </div>
+
+        <!-- 分类标签 -->
+        <div class="category-tabs" id="categoryTabs"></div>
+
+        <div class="q-list" id="qList">
+            <div class="loading">加载中...</div>
+        </div>
+    </div>
+
+    <footer id="footer"></footer>
+
+    <!-- 模态框 -->
+    <div class="modal-overlay" id="modalOverlay" style="display:none">
+        <div class="modal-box" id="modalBox"></div>
+    </div>
+
+    <script>
+        var currentUser = null;
+        var questionsCache = [];
+        var currentCategory = 'all';
+
+        var CATEGORIES = [
+            { id: 'all',       label: '全部',  icon: '' },
+            { id: '院校择校',  label: '院校择校',  icon: '📌' },
+            { id: '备考经验',  label: '备考经验',  icon: '📝' },
+            { id: '政策讨论',  label: '政策讨论',  icon: '📋' },
+            { id: '资料分享',  label: '资料分享',  icon: '📑' },
+            { id: '闲聊灌水',  label: '闲聊灌水',  icon: '💬' }
+        ];
+
+        function init() {
+            if (window.supabaseClient) { setup(); }
+            else { setTimeout(init, 200); }
+        }
+
+        function setup() {
+            checkAuth();
+            renderCategoryTabs();
+            loadQuestions();
+        }
+
+        function checkAuth() {
+            window.supabaseClient.auth.getSession().then(function(res) {
+                if (res.data.session) { currentUser = res.data.session.user; }
+                document.getElementById('btnAsk').disabled = !currentUser;
+                document.getElementById('btnAsk').textContent = currentUser ? '我要提问' : '登录后可提问';
+            });
+        }
+
+        function renderCategoryTabs() {
+            var html = '';
+            for (var i = 0; i < CATEGORIES.length; i++) {
+                var c = CATEGORIES[i];
+                var cls = (c.id === currentCategory) ? ' cat-tab active' : 'cat-tab';
+                html += '<span class="' + cls + '" onclick="switchCategory(\'' + c.id + '\')">' + c.icon + ' ' + c.label;
+                if (c.id !== 'all') html += '<span class="count" id="cnt_' + c.id + '"></span>';
+                html += '</span>';
+            }
+            document.getElementById('categoryTabs').innerHTML = html;
+        }
+
+        function switchCategory(cat) {
+            currentCategory = cat;
+            renderCategoryTabs();
+            renderQuestions();
+        }
+
+        function loadQuestions() {
+            window.supabaseClient
+                .from('questions')
+                .select('*, answers:answers(count)')
+                .order('created_at', { ascending: false })
+                .then(function(res) {
+                    if (res.error) { document.getElementById('qList').innerHTML = '<div class="loading">加载失败: ' + res.error.message + '</div>'; return; }
+                    questionsCache = res.data || [];
+                    updateCategoryCounts();
+                    renderQuestions();
+                });
+        }
+
+        function updateCategoryCounts() {
+            // 统计各分类数量
+            var counts = {};
+            for (var i = 1; i < CATEGORIES.length; i++) {
+                counts[CATEGORIES[i].id] = 0;
+            }
+            questionsCache.forEach(function(q) {
+                var cat = q.category || '闲聊灌水';
+                if (counts[cat] !== undefined) counts[cat]++;
+            });
+            for (var i = 1; i < CATEGORIES.length; i++) {
+                var el = document.getElementById('cnt_' + CATEGORIES[i].id);
+                if (el) el.textContent = '(' + counts[CATEGORIES[i].id] + ')';
+            }
+        }
+
+        function renderQuestions() {
+            var list = document.getElementById('qList');
+            var filtered = currentCategory === 'all'
+                ? questionsCache
+                : questionsCache.filter(function(q) { return (q.category || '闲聊灌水') === currentCategory; });
+
+            if (questionsCache.length === 0) {
+                list.innerHTML = '<div class="no-answer">还没有问题，快来提第一个吧 🎉</div>';
+                return;
+            }
+            if (filtered.length === 0 && questionsCache.length > 0) {
+                list.innerHTML = '<div class="no-answer">这个分类下暂无问题</div>';
+                return;
+            }
+
+            var html = '';
+            filtered.forEach(function(q) {
+                var time = timeAgo(q.created_at);
+                var email = (q.user_email || '匿名').split('@')[0];
+                var count = (q.answers && q.answers[0]) ? q.answers[0].count : 0;
+                var hasImg = q.content && q.content.indexOf('![](') !== -1 ? ' 📷' : '';
+                var cat = q.category || '闲聊灌水';
+                var catColors = {
+                    '院校择校': 'background:#e6f7ff;color:#096dd9',
+                    '备考经验': 'background:#f6ffed;color:#389e0d',
+                    '政策讨论': 'background:#fff7e6;color:#d48806',
+                    '资料分享': 'background:#f9f0ff;color:#722ed1',
+                    '闲聊灌水': 'background:#f5f5f5;color:#666'
+                };
+                var catStyle = catColors[cat] || catColors['闲聊灌水'];
+                html += '<div class="q-item" onclick="showDetail(' + q.id + ')">';
+                html += '<div class="q-title"><span class="q-cat" style="' + catStyle + '">' + cat + '</span>' + escHtml(q.title) + hasImg + '</div>';
+                html += '<div class="q-meta">';
+                html += '<span>' + email + '</span><span>' + time + '</span>';
+                html += '<span class="ans-count">' + count + ' 回答</span>';
+                html += '</div></div>';
+            });
+            list.innerHTML = html;
+        }
+
+        function showDetail(qid) {
+            var q = questionsCache.find(function(x) { return x.id === qid; });
+            if (!q) return;
+            document.getElementById('modalOverlay').style.display = 'flex';
+            var box = document.getElementById('modalBox');
+            var canDel = currentUser && currentUser.id === q.user_id ?
+                '<button class="btn-del" onclick="event.stopPropagation();delQuestion(' + q.id + ')">删除</button>' : '';
+            var cat = q.category || '闲聊灌水';
+            box.innerHTML = '<span class="close-btn" onclick="closeModal()">&times;</span>' +
+                '<h3>' + escHtml(q.title) + '</h3>' +
+                '<div class="content-text">' + renderContent(q.content) + '</div>' +
+                '<div class="q-detail-meta">' + cat + ' · ' + (q.user_email || '匿名').split('@')[0] + ' · ' + timeAgo(q.created_at) + canDel + '</div>' +
+                '<h4>回答</h4>' +
+                '<div id="answersList"><div class="loading">加载中...</div></div>' +
+                (currentUser ? buildAnswerForm(qid) :
+                '<p style="color:#999;margin-top:12px;text-align:center">登录后可以回答</p>');
+
+            loadAnswers(qid);
+        }
+
+        function buildAnswerForm(qid) {
+            return '<div style="margin-top:16px">' +
+                '<textarea id="ansInput_' + qid + '" placeholder="写下你的回答..." rows="3"></textarea>' +
+                '<div class="img-upload-area">' +
+                    '<label class="btn-img">📎 添加图片<input type="file" accept="image/*" style="display:none" onchange="uploadAnsImage(this,' + qid + ')"></label>' +
+                    '<span class="upload-progress" id="ansProgress_' + qid + '"></span>' +
+                '</div>' +
+                '<div class="img-preview-row" id="ansPreview_' + qid + '"></div>' +
+                '<button class="btn-submit" onclick="postAnswer(' + qid + ')">提交回答</button></div>';
+        }
+
+        function loadAnswers(qid) {
+            window.supabaseClient
+                .from('answers')
+                .select('*')
+                .eq('question_id', qid)
+                .order('created_at', { ascending: true })
+                .then(function(res) {
+                    var div = document.getElementById('answersList');
+                    if (res.error) { div.innerHTML = '<div class="no-answer">加载失败</div>'; return; }
+                    var answers = res.data || [];
+                    if (answers.length === 0) {
+                        div.innerHTML = '<div class="no-answer">暂无回答，来说两句吧</div>';
+                        return;
+                    }
+                    var html = '';
+                    answers.forEach(function(a) {
+                        var canDel = currentUser && currentUser.id === a.user_id ?
+                            '<button class="btn-del" onclick="delAnswer(' + a.id + ',' + qid + ')">删除</button>' : '';
+                        html += '<div class="answer-item">';
+                        html += '<div class="content-text">' + renderContent(a.content) + '</div>';
+                        html += '<div class="a-meta">' + (a.user_email || '匿名').split('@')[0] + ' · ' + timeAgo(a.created_at) + canDel + '</div>';
+                        html += '</div>';
+                    });
+                    div.innerHTML = html;
+                });
+        }
+
+        function postAnswer(qid) {
+            var input = document.getElementById('ansInput_' + qid);
+            var content = (input ? input.value : '').trim();
+            var prevDiv = document.getElementById('ansPreview_' + qid);
+            if (prevDiv) {
+                var imgs = prevDiv.querySelectorAll('img');
+                for (var i = 0; i < imgs.length; i++) {
+                    content += '\n![](' + imgs[i].src + ')';
+                }
+            }
+            if (!content) { alert('请输入回答内容'); return; }
+            var btn = document.querySelector('#modalBox .btn-submit');
+            btn.disabled = true; btn.textContent = '提交中...';
+            window.supabaseClient
+                .from('answers')
+                .insert({ question_id: qid, content: content, user_id: currentUser.id, user_email: currentUser.email })
+                .then(function(res) {
+                    if (res.error) { alert('失败: ' + res.error.message); btn.disabled = false; btn.textContent = '提交回答'; return; }
+                    loadAnswers(qid);
+                    loadQuestions();
+                    btn.disabled = false; btn.textContent = '提交回答';
+                    if (input) input.value = '';
+                    if (prevDiv) prevDiv.innerHTML = '';
+                });
+        }
+
+        function showAskModal() {
+            if (!currentUser) { alert('请先登录'); return; }
+            document.getElementById('modalOverlay').style.display = 'flex';
+            var catOptions = '';
+            for (var i = 1; i < CATEGORIES.length; i++) {
+                catOptions += '<option value="' + CATEGORIES[i].id + '">' + CATEGORIES[i].icon + ' ' + CATEGORIES[i].label + '</option>';
+            }
+            document.getElementById('modalBox').innerHTML =
+                '<span class="close-btn" onclick="closeModal()">&times;</span>' +
+                '<h3>发布问题</h3>' +
+                '<select id="qCategory">' + catOptions + '</select>' +
+                '<input type="text" id="qTitle" placeholder="问题标题（一句话说清楚）" maxlength="100">' +
+                '<textarea id="qContent" placeholder="详细描述你的问题...（可选，支持贴图）" rows="4"></textarea>' +
+                '<div class="img-upload-area">' +
+                    '<label class="btn-img">📎 添加图片<input type="file" accept="image/*" style="display:none" onchange="uploadQImage(this)"></label>' +
+                    '<span class="upload-progress" id="qProgress"></span>' +
+                '</div>' +
+                '<div class="img-preview-row" id="qPreview"></div>' +
+                '<button class="btn-submit" id="btnPost" onclick="postQuestion()">发布问题</button>';
+        }
+
+        function postQuestion() {
+            var category = document.getElementById('qCategory').value;
+            var title = document.getElementById('qTitle').value.trim();
+            var content = document.getElementById('qContent').value.trim();
+            var prevDiv = document.getElementById('qPreview');
+            var imgs = prevDiv.querySelectorAll('img');
+            for (var i = 0; i < imgs.length; i++) {
+                content += '\n![](' + imgs[i].src + ')';
+            }
+            if (!title) { alert('请输入问题标题'); return; }
+            var btn = document.getElementById('btnPost');
+            btn.disabled = true; btn.textContent = '发布中...';
+            window.supabaseClient
+                .from('questions')
+                .insert({ title: title, content: content, category: category, user_id: currentUser.id, user_email: currentUser.email })
+                .then(function(res) {
+                    if (res.error) { alert('失败: ' + res.error.message); btn.disabled = false; btn.textContent = '发布问题'; return; }
+                    closeModal();
+                    loadQuestions();
+                });
+        }
+
+        function uploadQImage(input) {
+            uploadImage(input.files[0], 'qProgress', 'qPreview');
+            input.value = '';
+        }
+
+        function uploadAnsImage(input, qid) {
+            uploadImage(input.files[0], 'ansProgress_' + qid, 'ansPreview_' + qid);
+            input.value = '';
+        }
+
+        function uploadImage(file, progressId, previewId) {
+            if (!file) return;
+            if (file.size > 5 * 1024 * 1024) { alert('图片不能超过 5MB'); return; }
+            var progress = document.getElementById(progressId);
+            var preview = document.getElementById(previewId);
+            progress.textContent = '上传中...';
+            var ext = file.name.split('.').pop().toLowerCase();
+            var filename = Date.now() + '-' + Math.random().toString(36).substring(2, 8) + '.' + ext;
+            window.supabaseClient.storage
+                .from('community-images')
+                .upload(filename, file, { cacheControl: '3600', upsert: false })
+                .then(function(res) {
+                    progress.textContent = '';
+                    if (res.error) { alert('上传失败: ' + res.error.message); return; }
+                    var url = window.supabaseClient.storage.from('community-images').getPublicUrl(filename).data.publicUrl;
+                    var item = document.createElement('span');
+                    item.className = 'preview-item';
+                    item.innerHTML = '<img src="' + url + '" alt=""><button class="remove-img" onclick="this.parentElement.remove()">x</button>';
+                    preview.appendChild(item);
+                });
+        }
+
+        function delQuestion(qid) {
+            if (!confirm('确定删除这个问题吗？所有回答也会被删除。')) return;
+            window.supabaseClient.from('questions').delete().eq('id', qid).then(function(res) {
+                if (res.error) { alert('删除失败: ' + res.error.message); return; }
+                closeModal();
+                loadQuestions();
+            });
+        }
+
+        function delAnswer(aid, qid) {
+            if (!confirm('确定删除这条回答吗？')) return;
+            window.supabaseClient.from('answers').delete().eq('id', aid).then(function(res) {
+                if (res.error) { alert('删除失败: ' + res.error.message); return; }
+                loadAnswers(qid);
+                loadQuestions();
+            });
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').style.display = 'none';
+            document.getElementById('modalBox').innerHTML = '';
+        }
+
+        document.getElementById('modalOverlay').onclick = function(e) {
+            if (e.target === this) closeModal();
+        };
+
+        function renderContent(text) {
+            if (!text) return '';
+            var escaped = escHtml(text);
+            escaped = escaped.replace(/!\[\]\((https?:\/\/[^\)]+)\)/g, function(m, url) {
+                return '<img class="content-img" src="' + url + '" alt="" loading="lazy" onclick="window.open(\'' + url + '\')">';
+            });
+            return escaped;
+        }
+
+        function timeAgo(d) {
+            if (!d) return '';
+            var now = new Date();
+            var then = new Date(d);
+            var sec = Math.floor((now - then) / 1000);
+            if (sec < 60) return '刚刚';
+            if (sec < 3600) return Math.floor(sec / 60) + ' 分钟前';
+            if (sec < 86400) return Math.floor(sec / 3600) + ' 小时前';
+            if (sec < 2592000) return Math.floor(sec / 86400) + ' 天前';
+            return then.toLocaleDateString('zh-CN');
+        }
+
+        function escHtml(s) {
+            var d = document.createElement('div');
+            d.textContent = s || '';
+            return d.innerHTML;
+        }
+
+        init();
+    </script>
+    <script src="supabase.js"></script>
+    <script src="common.js"></script>
+</body>
+</html>
